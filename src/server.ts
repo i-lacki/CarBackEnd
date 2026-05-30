@@ -45,6 +45,32 @@ app.post('/cars', async (req: Request, res: Response) => {
   }
 });
 
+// Login route - obsługuje role ADMIN/USER
+app.post('/login', async (req: Request, res: Response) => {
+  const { username } = req.body;
+
+  try {
+    // Prosta logika: jeśli username to 'admin', dajemy ADMINA, inaczej zwykłego USERA
+    // Możesz to później rozbudować o zapytanie do bazy (pool.query)
+    if (username.toLowerCase() === 'admin') {
+      res.json({
+        id: '1',
+        username: 'admin',
+        role: 'ADMIN'
+      });
+    } else {
+      res.json({
+        id: Date.now().toString(), // Generujemy tymczasowe ID
+        username: username,
+        role: 'USER'
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Health check
 app.get('/health', (req, res) => res.send('Server is running!'));
 
