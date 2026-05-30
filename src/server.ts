@@ -20,6 +20,25 @@ const pool = new Pool({
   }
 });
 
+// Bezpieczna inicjalizacja bazy bez await na poziomie głównym
+pool.query(`
+  CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER'
+  );
+`).then(() => {
+  return pool.query(`
+    INSERT INTO users (username, role) 
+    VALUES ('admin', 'ADMIN') 
+    ON CONFLICT (username) DO NOTHING;
+  `);
+}).then(() => {
+  console.log("Baza danych zainicjalizowana pomyślnie!");
+}).catch(err => {
+  console.error("Błąd podczas inicjalizacji bazy:", err);
+});
+
 // Routes
 app.get('/cars', async (req: Request, res: Response) => {
   try {
